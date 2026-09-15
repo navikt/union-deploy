@@ -1,0 +1,50 @@
+name: Deploy Union Task
+
+on:
+  workflow_call:
+    inputs:
+      flyte-task-file:
+        description: "Path to the task file (e.g., ./mytasks/task.py)"
+        required: true
+        type: string
+      dependency-file:
+        description: "Path to either requirements.txt or pyproject.toml"
+        required: true
+        type: string
+      union-project:
+        description: ""
+        required: true
+        type: string
+      union-domain:
+        description: "Development, staging or production"
+        required: true
+        type: string
+      environment:
+        description: "Internal, platform team only. Target GCP environment, 'dev' or 'prod'. Consumers should leave this as the default ('prod')."
+        required: false
+        default: prod
+        type: string
+      python-version:
+        description: "Python version to use for the virtual environment. Only relevant if not using pyproject.toml."
+        required: false
+        type: string
+
+jobs:
+  deploy-union-task:
+    runs-on: dataplattform-runner
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout calling repo
+        uses: actions/checkout@v4
+
+      - name: Deploy
+        uses: navikt/union-dataplattform/actions/deploy@main
+        with:
+          flyte-task-file: ${{ inputs.flyte-task-file }}
+          dependency-file: ${{ inputs.dependency-file }}
+          union-project: ${{ inputs.union-project }}
+          union-domain: ${{ inputs.union-domain }}
+          environment: ${{ inputs.environment }}
+          python-version: ${{ inputs.python-version }}

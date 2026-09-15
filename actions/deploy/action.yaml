@@ -1,0 +1,207 @@
+name: Deploy Union Task
+description: Deploy a Union task to the specified project and domain
+
+inputs:
+  flyte-task-file:
+    description: "Path to the task file (e.g., ./mytasks/task.py)"
+    required: true
+  dependency-file:
+    description: "Path to either requirements.txt or pyproject.toml"
+    required: true
+  union-project:
+    description: ""
+    required: true
+  union-domain:
+    description: "Development, staging or production"
+    required: true
+  environment:
+    description: "Internal, platform team only. Target GCP environment, 'dev' or 'prod'. Consumers should leave this as the default ('prod')."
+    default: prod
+  python-version:
+    description: "Python version to use for the virtual environment. Only relevant if not using pyproject.toml."
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - id: config
+      name: Validate inputs and resolve environment configuration
+      shell: bash
+      env:
+        ENVIRONMENT: ${{ inputs.environment }}
+        UNION_PROJECT: ${{ inputs.union-project }}
+        UNION_DOMAIN: ${{ inputs.union-domain }}
+        REPOSITORY: ${{ github.repository }}
+        DEPENDENCY_FILE: ${{ inputs.dependency-file }}
+        FLYTE_TASK_FILE: ${{ inputs.flyte-task-file }}
+        PYTHON_VERSION: ${{ inputs.python-version }}
+      run: |
+        set -euo pipefail
+
+        errors=()
+
+        case "$ENVIRONMENT" in
+          prod)
+            provider="projects/430580391891/locations/global/workloadIdentityPools/ci-dataplattform/providers/ci-dataplattform"
+            ;;
+          dev)
+            provider="projects/483437874962/locations/global/workloadIdentityPools/ci-dataplattform/providers/ci-dataplattform"
+            ;;
+          *)
+            errors+=("Invalid environment '$ENVIRONMENT' - must be 'dev' or 'prod'.")
+            ;;
+        esac
+
+        # Reject values that could inject extra lines/keys into GITHUB_OUTPUT.
+        if [[ ! "$UNION_PROJECT" =~ ^[A-Za-z0-9-]+$ ]]; then
+          errors+=("Invalid union-project '$UNION_PROJECT' - only alphanumeric characters and hyphens are allowed.")
+        fi
+
+        case "$UNION_DOMAIN" in
+          development|staging|production) ;;
+          *)
+            errors+=("Invalid union-domain '$UNION_DOMAIN' - must be 'development', 'staging' or 'production'.")
+            ;;
+        esac
+
+        if [[ "$FLYTE_TASK_FILE" != *.py ]]; then
+          errors+=("Invalid flyte-task-file '$FLYTE_TASK_FILE' - must be a Python (.py) file.")
+        elif [[ ! -f "$FLYTE_TASK_FILE" ]]; then
+          errors+=("flyte-task-file '$FLYTE_TASK_FILE' does not exist.")
+        fi
+
+        dependency_file_basename="$(basename "$DEPENDENCY_FILE")"
+        if [[ "$dependency_file_basename" != "pyproject.toml" && "$dependency_file_basename" != requirements*.txt ]]; then
+          errors+=("Invalid dependency-file '$DEPENDENCY_FILE' - must be 'pyproject.toml' or a 'requirements*.txt' file.")
+        elif [[ ! -f "$DEPENDENCY_FILE" ]]; then
+          errors+=("dependency-file '$DEPENDENCY_FILE' does not exist.")
+        elif [[ "$dependency_file_basename" == "pyproject.toml" ]]; then
+          dependency_dir="$(dirname "$DEPENDENCY_FILE")"
+          #if [[ ! -f "${dependency_dir}/uv.lock" ]]; then
+          #  errors+=("uv.lock not found next to '$DEPENDENCY_FILE' - required for 'uv sync --frozen'.")
+          #fi
+        fi
+
+        if [[ -n "$PYTHON_VERSION" && ! "$PYTHON_VERSION" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+          errors+=("Invalid python-version '$PYTHON_VERSION' - must be in the form 'X.Y' or 'X.Y.Z'.")
+        fi
+
+        if (( ${#errors[@]} > 0 )); then
+          for err in "${errors[@]}"; do
+            echo "::error::$err" >&2
+          done
+          exit 1
+        fi
+
+        repo="${REPOSITORY##*/}"
+        # GSA account_id is capped at 30 chars; terraform truncates the repo to 26 ("ud-" prefix = 3).
+        sa_repo="${repo:0:26}"
+
+        {
+          echo "provider=${provider}"
+          echo "flyte_api_key_secret=union-api-key-${UNION_PROJECT}"
+          echo "flyte_task_file=$(realpath "${FLYTE_TASK_FILE}")"
+          echo "working_directory=$(dirname "${DEPENDENCY_FILE}")"
+          echo "gcp_project=nav-data-union-restricted-${ENVIRONMENT}"
+          echo "service_account=ud-${sa_repo}@nav-data-union-restricted-${ENVIRONMENT}.iam.gserviceaccount.com"
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Install the latest version of uv
+      uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+      with:
+        github-token: ${{ github.token }}
+
+    - id: auth
+      name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+      with:
+        token_format: access_token
+        workload_identity_provider: ${{ steps.config.outputs.provider }}
+        service_account: ${{ steps.config.outputs.service_account }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+      with:
+        install_components: gke-gcloud-auth-plugin
+        
+    - name: Install workflow dependencies
+      shell: bash
+      working-directory: ${{ steps.config.outputs.working_directory }}
+      env:
+        DEPENDENCY_FILE: ${{ inputs.dependency-file }}
+        PYTHON_VERSION: ${{ inputs.python-version }}
+        UV_INDEX: gar=https://europe-west1-python.pkg.dev/nav-data-images-prod/pypi/simple
+        UV_INDEX_GAR_USERNAME: oauth2accesstoken
+        UV_INDEX_GAR_PASSWORD: ${{ steps.auth.outputs.access_token }}
+      run: |
+        set -euo pipefail
+
+        dependency_file_basename="$(basename "$DEPENDENCY_FILE")"
+
+        if [ "$dependency_file_basename" = "pyproject.toml" ]; then
+          if [[ -f uv.lock ]]; then 
+            rm -f uv.lock
+          fi
+          uv sync
+        else
+          if [ -n "$PYTHON_VERSION" ]; then
+            uv venv --python "$PYTHON_VERSION"
+          else
+            uv venv
+          fi
+          uv pip install -r "$dependency_file_basename"
+        fi
+    
+    - name: Verify flyte is installed
+      shell: bash
+      working-directory: ${{ steps.config.outputs.working_directory }}
+      run: |
+        set -euo pipefail
+        if ! uv run --no-sync python -c "import flyte" 2>/dev/null; then
+          echo "::error::'flyte' is a required dependency but is not installed. Add it to your pyproject.toml or requirements file." >&2
+          exit 1
+        fi
+
+    - name: Get flyte API key
+      shell: bash
+      env:
+        FLYTE_API_KEY_SECRET: ${{ steps.config.outputs.flyte_api_key_secret }}
+        PROJECT: ${{ steps.config.outputs.gcp_project }}
+      run: |
+        set -euo pipefail
+
+        flyte_api_key="$(gcloud secrets versions access latest \
+          --secret="$FLYTE_API_KEY_SECRET" \
+          --project "$PROJECT")"
+
+        flyte_api_key_b64="$(printf '%s' "$flyte_api_key" | base64 | tr -d '\n')"
+
+        # Mask both the raw and base64-encoded values in logs before exporting.
+        echo "::add-mask::$flyte_api_key"
+        echo "::add-mask::$flyte_api_key_b64"
+
+        echo "FLYTE_API_KEY=$flyte_api_key_b64" >> "$GITHUB_ENV"
+    
+    - name: Create flyte config
+      shell: bash
+      working-directory: ${{ steps.config.outputs.working_directory }}
+      env:
+        UNION_PROJECT: ${{ inputs.union-project }}
+        UNION_DOMAIN: ${{ inputs.union-domain }}
+      run: |
+        set -euo pipefail
+        uv run --no-sync flyte create config --project "$UNION_PROJECT" --domain "$UNION_DOMAIN" --builder remote --force
+
+    - name: Deploy
+      shell: bash
+      working-directory: ${{ steps.config.outputs.working_directory }}
+      env:
+        FLYTE_TASK_FILE: ${{ steps.config.outputs.flyte_task_file }}
+      run: |
+        set -euo pipefail
+        uv run --no-sync flyte deploy --all "$FLYTE_TASK_FILE"
+
+    - name: Clear flyte API key
+      if: always()
+      shell: bash
+      run: echo "FLYTE_API_KEY=" >> "$GITHUB_ENV"
