@@ -19,7 +19,7 @@ greeting_task = ContainerTask(
 container_env = flyte.TaskEnvironment.from_task("container_env", greeting_task)
 
 env = flyte.TaskEnvironment(
-    name="container_hello",
+    name="test_container_deploy",
     depends_on=[container_env],
     image=flyte.Image.from_base(
         image_uri="europe-west1-docker.pkg.dev/nav-data-images-prod/nav-union-images/flyte:3.13-base"
@@ -27,6 +27,6 @@ env = flyte.TaskEnvironment(
 )
 
 
-@env.task
+@env.task(entrypoint=True)
 async def main():
     await greeting_task()

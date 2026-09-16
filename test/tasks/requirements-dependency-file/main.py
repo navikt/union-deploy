@@ -2,7 +2,7 @@ import flyte
 from kubernetes import client as k8s
 
 env = flyte.TaskEnvironment(
-    name="hello_ci_deploy_requirements",
+    name="test_requirements_deploy",
     image=flyte.Image.from_base(
         image_uri="europe-west1-docker.pkg.dev/nav-data-images-prod/nav-union-images/flyte:3.13-base"
     )
@@ -25,13 +25,6 @@ env = flyte.TaskEnvironment(
         ),
     )
 
-
-
-@env.task
-def foo() -> str:
-    return "ci"
-
-
 @env.task(entrypoint=True)
 def main() -> str:
-    return "Hello, " + foo()
+    return "Hello, ci"
