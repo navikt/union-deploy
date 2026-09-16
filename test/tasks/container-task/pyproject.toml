@@ -1,0 +1,19 @@
+[project]
+name = "container-tasks"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "ankjel", email = "anna.sofie.kjelstrup@nav.no" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "flyte==2.7.2",
+]
+
+[project.scripts]
+container-tasks = "container_tasks:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"

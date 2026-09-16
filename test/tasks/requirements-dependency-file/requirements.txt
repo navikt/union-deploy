@@ -1,0 +1,2 @@
+flyte==2.8.0
+kubernetes==26.1.0

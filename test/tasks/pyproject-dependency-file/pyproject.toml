@@ -1,0 +1,20 @@
+[project]
+name = "ci-deployment-demo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "ankjel", email = "anna.sofie.kjelstrup@nav.no" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "flyte>=2.7.2",
+    "kubernetes>=36.0.3",
+]
+
+[project.scripts]
+ci-deployment-demo = "ci_deployment_demo:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"
