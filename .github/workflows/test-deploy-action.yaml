@@ -1,0 +1,64 @@
+name: Test deploy action
+
+# Runs the deploy action/workflow against the example tasks in test/tasks/ whenever
+# either changes, so a broken action.yaml or deploy.yaml is caught before release.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - actions/deploy/action.yaml
+      - .github/workflows/deploy.yaml
+  pull_request:
+    paths:
+      - actions/deploy/action.yaml
+      - .github/workflows/deploy.yaml
+  workflow_dispatch:
+
+
+jobs:
+  deploy-pyproject-dependecy-file:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      flyte-task-file: ./test/tasks/pyproject-dependency-file/main.py
+      dependency-file: ./test/tasks/pyproject-dependency-file/pyproject.toml
+      union-project: dataplattform
+      union-domain: development
+      environment: dev
+  deploy-container-task:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      flyte-task-file: ./test/tasks/container-task/container_task.py
+      dependency-file: ./test/tasks/container-task/pyproject.toml
+      union-project: dataplattform
+      union-domain: development
+      environment: dev
+  deploy-requirements:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      flyte-task-file: ./test/tasks/requirements-dependency-file/main.py
+      dependency-file: ./test/tasks/requirements-dependency-file/requirements.txt
+      union-project: dataplattform
+      union-domain: development
+      environment: dev
+  deploy-python-version:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      flyte-task-file: ./test/tasks/requirements-dependency-file/main.py
+      dependency-file: ./test/tasks/requirements-dependency-file/requirements.txt
+      union-project: dataplattform
+      union-domain: development
+      environment: dev
+      python-version: 3.14
