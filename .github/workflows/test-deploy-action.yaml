@@ -17,7 +17,7 @@ on:
 
 
 jobs:
-  deploy-pyproject-dependecy-file:
+  pyproject-dependecy-file:
     permissions:
       contents: read
       id-token: write
@@ -28,7 +28,7 @@ jobs:
       union-project: dataplattform
       union-domain: development
       environment: dev
-  deploy-container-task:
+  container-task:
     permissions:
       contents: read
       id-token: write
@@ -39,7 +39,7 @@ jobs:
       union-project: dataplattform
       union-domain: development
       environment: dev
-  deploy-requirements:
+  requirements-dependency-file:
     permissions:
       contents: read
       id-token: write
@@ -50,7 +50,7 @@ jobs:
       union-project: dataplattform
       union-domain: development
       environment: dev
-  deploy-python-version:
+  python-version:
     permissions:
       contents: read
       id-token: write
