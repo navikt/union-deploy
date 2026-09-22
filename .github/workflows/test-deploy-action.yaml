@@ -89,7 +89,7 @@ jobs:
       id-token: write
     uses: ./.github/workflows/deploy.yaml
     with:
-      flyte-task-file: ./test/tasks/container-task/container_task.py
+      flyte-task-file: ./test/tasks/container-task/main.py
       dependency-file: ./test/tasks/container-task/pyproject.toml
       union-project: dataplattform
       union-domain: development
