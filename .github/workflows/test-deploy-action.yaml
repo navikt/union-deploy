@@ -64,10 +64,10 @@ jobs:
       python-version: 3.14
   pyproject-dependecy-file-prod:
     needs:
-      - deploy-pyproject-dependecy-file
-      - deploy-container-task
-      - deploy-requirements
-      - deploy-python-version
+      - pyproject-dependecy-file-dev
+      - container-task-dev
+      - requirements-dev
+      - python-version-dev
     permissions:
       contents: read
       id-token: write
@@ -80,10 +80,10 @@ jobs:
       environment: prod
   container-task-prod:
     needs:
-      - deploy-pyproject-dependecy-file
-      - deploy-container-task
-      - deploy-requirements
-      - deploy-python-version
+      - pyproject-dependecy-file-dev
+      - container-task-dev
+      - requirements-dev
+      - python-version-dev
     permissions:
       contents: read
       id-token: write
@@ -96,10 +96,10 @@ jobs:
       environment: prod
   requirements-prod:
     needs:
-      - deploy-pyproject-dependecy-file
-      - deploy-container-task
-      - deploy-requirements
-      - deploy-python-version
+      - pyproject-dependecy-file-dev
+      - container-task-dev
+      - requirements-dev
+      - python-version-dev
     permissions:
       contents: read
       id-token: write
@@ -112,10 +112,10 @@ jobs:
       environment: prod
   python-version-prod:
     needs:
-      - deploy-pyproject-dependecy-file
-      - deploy-container-task
-      - deploy-requirements
-      - deploy-python-version
+      - pyproject-dependecy-file-dev
+      - container-task-dev
+      - requirements-dev
+      - python-version-dev
     permissions:
       contents: read
       id-token: write
