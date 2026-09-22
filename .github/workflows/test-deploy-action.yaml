@@ -17,7 +17,7 @@ on:
 
 
 jobs:
-  pyproject-dependecy-file:
+  pyproject-dependecy-file-dev:
     permissions:
       contents: read
       id-token: write
@@ -28,7 +28,7 @@ jobs:
       union-project: dataplattform
       union-domain: development
       environment: dev
-  container-task:
+  container-task-dev:
     permissions:
       contents: read
       id-token: write
@@ -39,7 +39,7 @@ jobs:
       union-project: dataplattform
       union-domain: development
       environment: dev
-  requirements-dependency-file:
+  requirements-dev:
     permissions:
       contents: read
       id-token: write
@@ -50,7 +50,7 @@ jobs:
       union-project: dataplattform
       union-domain: development
       environment: dev
-  python-version:
+  python-version-dev:
     permissions:
       contents: read
       id-token: write
@@ -61,4 +61,69 @@ jobs:
       union-project: dataplattform
       union-domain: development
       environment: dev
+      python-version: 3.14
+  pyproject-dependecy-file-prod:
+    needs:
+      - deploy-pyproject-dependecy-file
+      - deploy-container-task
+      - deploy-requirements
+      - deploy-python-version
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      flyte-task-file: ./test/tasks/pyproject-dependency-file/main.py
+      dependency-file: ./test/tasks/pyproject-dependency-file/pyproject.toml
+      union-project: dataplattform
+      union-domain: development
+      environment: prod
+  container-task-prod:
+    needs:
+      - deploy-pyproject-dependecy-file
+      - deploy-container-task
+      - deploy-requirements
+      - deploy-python-version
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      flyte-task-file: ./test/tasks/container-task/container_task.py
+      dependency-file: ./test/tasks/container-task/pyproject.toml
+      union-project: dataplattform
+      union-domain: development
+      environment: prod
+  requirements-prod:
+    needs:
+      - deploy-pyproject-dependecy-file
+      - deploy-container-task
+      - deploy-requirements
+      - deploy-python-version
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      flyte-task-file: ./test/tasks/requirements-dependency-file/main.py
+      dependency-file: ./test/tasks/requirements-dependency-file/requirements.txt
+      union-project: dataplattform
+      union-domain: development
+      environment: prod
+  python-version-prod:
+    needs:
+      - deploy-pyproject-dependecy-file
+      - deploy-container-task
+      - deploy-requirements
+      - deploy-python-version
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      flyte-task-file: ./test/tasks/requirements-dependency-file/main.py
+      dependency-file: ./test/tasks/requirements-dependency-file/requirements.txt
+      union-project: dataplattform
+      union-domain: development
+      environment: prod
       python-version: 3.14
