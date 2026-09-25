@@ -44,7 +44,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy
-        uses: navikt/union-deploy/actions/deploy@main
+        uses: navikt/union-deploy/actions/deploy@v1
         with:
           flyte-task-file: ${{ inputs.flyte-task-file }}
           flyte-task-version: ${{ inputs.flyte-task-version }}

@@ -84,9 +84,9 @@ The public workflow is `.github/workflows/deploy.yaml`; it calls `actions/deploy
 
 ### Release v1
 
-1. After the `main` test run passes, change the Deploy step in `.github/workflows/deploy.yaml` back to `uses: navikt/union-deploy/actions/deploy@v1`. Commit and push that change. A test run for this commit still loads the *previous* `v1` action; use the earlier `@main` run to verify the new action.
-2. From the release commit, with a clean worktree, run `./release-v1.sh`. The script verifies that the committed workflow refers to `actions/deploy@v1`, then moves the remote and local `v1` tags to `HEAD`. It does not push the branch or check CI. It refuses to overwrite the remote tag if someone else moves it between the check and the push.
-3. Callers using the workflow at `@v1` now get both the workflow and action from the new tag. For the next development cycle, change the Deploy step back to `@main` in a new commit; this does not affect the released `v1` tag.
+1. After the `main` test run passes with the Deploy step using `@main`, change it back to `uses: navikt/union-deploy/actions/deploy@v1` and commit the change. Do not push this release commit to `main` yet: if the workflow passes new inputs to the action, a run before the tag moves would load the old `v1` action.
+2. From the release commit, with a clean worktree, run `./release-v1.sh` **before pushing `main`**. The script verifies that the committed workflow refers to `actions/deploy@v1`, then moves the remote and local `v1` tags to `HEAD`. Pushing the tag also uploads the commit; the script does not push the branch or check CI. It refuses to overwrite the remote tag if someone else moves it between the check and the push.
+3. Push `main` and check its test run; it now resolves `actions/deploy@v1` to the new action. Callers using the workflow at `@v1` also get both the workflow and action from the new tag. For the next development cycle, change the Deploy step back to `@main` in a new commit; this does not affect the released `v1` tag.
 
 ### New major versions
 
