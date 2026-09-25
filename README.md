@@ -45,6 +45,7 @@ The permissions are required so the workflow can check out your repository and a
 | Input | Required | Description |
 | --- | --- | --- |
 | `flyte-task-file` | Yes | Path to the Python file containing the Flyte task or tasks, for example `./tasks/my_task.py`. |
+| `flyte-task-version` | No | Version identifier for the deployed Flyte tasks, passed to `flyte deploy --version`. If omitted, Flyte uses its default versioning. |
 | `dependency-file` | Yes | Path to `pyproject.toml` or a `requirements*.txt` file, for example `./requirements.txt`. Dependencies are installed from its directory. |
 | `union-project` | Yes | Union project registered for this GitHub repository. Only letters, numbers, and hyphens are accepted. |
 | `union-domain` | Yes | Target domain: `development`, `staging`, or `production`. |
