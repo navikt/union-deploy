@@ -7,6 +7,10 @@ on:
         description: "Path to the task file (e.g., ./mytasks/task.py)"
         required: true
         type: string
+      flyte-task-version:
+        description: "Version identifier for the deployed Flyte tasks. If omitted, Flyte uses its default versioning."
+        required: false
+        type: string
       dependency-file:
         description: "Path to either requirements.txt or pyproject.toml"
         required: true
@@ -40,9 +44,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy
-        uses: navikt/union-deploy/actions/deploy@v1
+        uses: navikt/union-deploy/actions/deploy@main
         with:
           flyte-task-file: ${{ inputs.flyte-task-file }}
+          flyte-task-version: ${{ inputs.flyte-task-version }}
           dependency-file: ${{ inputs.dependency-file }}
           union-project: ${{ inputs.union-project }}
           union-domain: ${{ inputs.union-domain }}

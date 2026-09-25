@@ -28,6 +28,18 @@ jobs:
       union-project: dataplattform
       union-domain: development
       environment: dev
+  flyte-task-version-dev:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      flyte-task-file: ./test/tasks/pyproject-dependency-file/main.py
+      flyte-task-version: 0.0.3
+      dependency-file: ./test/tasks/pyproject-dependency-file/pyproject.toml
+      union-project: dataplattform
+      union-domain: development
+      environment: dev
   container-task-dev:
     permissions:
       contents: read

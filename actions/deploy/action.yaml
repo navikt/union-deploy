@@ -8,6 +8,9 @@ inputs:
   dependency-file:
     description: "Path to either requirements.txt or pyproject.toml"
     required: true
+  flyte-task-version:
+    description: "Version identifier for the deployed Flyte tasks. If omitted, Flyte uses its default versioning."
+    required: false
   union-project:
     description: ""
     required: true
@@ -34,6 +37,7 @@ runs:
         REPOSITORY: ${{ github.repository }}
         DEPENDENCY_FILE: ${{ inputs.dependency-file }}
         FLYTE_TASK_FILE: ${{ inputs.flyte-task-file }}
+        FLYTE_TASK_VERSION: ${{ inputs.flyte-task-version }}
         PYTHON_VERSION: ${{ inputs.python-version }}
       run: |
         set -euo pipefail
@@ -84,6 +88,10 @@ runs:
 
         if [[ -n "$PYTHON_VERSION" && ! "$PYTHON_VERSION" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
           errors+=("Invalid python-version '$PYTHON_VERSION' - must be in the form 'X.Y' or 'X.Y.Z'.")
+        fi
+
+        if [[ "$FLYTE_TASK_VERSION" =~ [[:cntrl:]] ]]; then
+          errors+=("Invalid version: control characters are not allowed.")
         fi
 
         if (( ${#errors[@]} > 0 )); then
@@ -195,9 +203,16 @@ runs:
       working-directory: ${{ steps.config.outputs.working_directory }}
       env:
         FLYTE_TASK_FILE: ${{ steps.config.outputs.flyte_task_file }}
+        FLYTE_TASK_VERSION: ${{ inputs.flyte-task-version }}
       run: |
         set -euo pipefail
-        uv run --no-sync flyte deploy --all "$FLYTE_TASK_FILE"
+        args=(--all)
+        if [[ -n "$FLYTE_TASK_VERSION" ]]; then
+          args+=(--version "$FLYTE_TASK_VERSION")
+        fi
+        args+=("$FLYTE_TASK_FILE")
+
+        uv run --no-sync flyte deploy "${args[@]}"
 
     - name: Clear flyte API key
       if: always()
