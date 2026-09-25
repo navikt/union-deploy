@@ -70,3 +70,7 @@ To select Python when using a requirements file:
 - **Task or dependency file does not exist:** Paths are relative to the repository root. Check the spelling and location of both files.
 - **Invalid domain:** Use exactly `development`, `staging`, or `production`.
 - **Dependencies differ from your local environment:** The workflow currently does not respect `uv.lock`. When using `pyproject.toml`, it resolves dependencies again through our internal PyPI proxy. This can select versions that differ from your local lockfile. This is subject to change in the future when a new PyPI proxy (Artifact Keeper) is ready, at that time we will require `uv.lock` files to be built with that proxy.
+
+## Releasing v1
+
+On `main`, the reusable workflow can use `actions/deploy@main` for development. To release, commit a version of `.github/workflows/deploy.yaml` that uses `navikt/union-deploy/actions/deploy@v1`, then run `./release-v1.sh` from that commit. The script requires a clean worktree and moves the remote and local `v1` tags to `HEAD`. It refuses to overwrite the remote tag if it has changed since the script checked it. Existing callers of `@v1` will then use the newly tagged workflow and action. After releasing, you can switch the workflow reference back to `@main` for development.
