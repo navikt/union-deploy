@@ -74,19 +74,7 @@ To select Python when using a requirements file:
 
 ## Developing and releasing
 
-The public workflow is `.github/workflows/deploy.yaml`; it calls `actions/deploy/action.yaml` through a separate `uses:` reference. These refs are independent: a caller using the workflow at `@v1` does not automatically use the action at `@v1`. We use `main` for development and move the `v1` tag manually for stable releases. Do not expose the action ref as a workflow input.
-
-### Develop and test
-
-1. In `.github/workflows/deploy.yaml`, set the Deploy step to `uses: navikt/union-deploy/actions/deploy@main` before developing. Commit and push workflow and action changes to `main`.
-2. Check the **Test deploy action** workflow (`.github/workflows/test-deploy-action.yaml`) on `main`. It runs when either deploy file changes and calls the reusable workflow from the tested commit against the example tasks. With `@main` in the reusable workflow, it loads the action from `main`.
-3. A pull request run can test proposed workflow changes, but `@main` still loads the action already on `main`, not unmerged action changes in the pull request. For action changes, check the run after those changes land on `main`. Treat `main` as unstable until a release is made.
-
-### Release v1
-
-1. After the `main` test run passes with the Deploy step using `@main`, change it back to `uses: navikt/union-deploy/actions/deploy@v1` and commit the change. Do not push this release commit to `main` yet: if the workflow passes new inputs to the action, a run before the tag moves would load the old `v1` action.
-2. From the release commit, with a clean worktree, run `./release-v1.sh` **before pushing `main`**. The script verifies that the committed workflow refers to `actions/deploy@v1`, then moves the remote and local `v1` tags to `HEAD`. Pushing the tag also uploads the commit; the script does not push the branch or check CI. It refuses to overwrite the remote tag if someone else moves it between the check and the push.
-3. Push `main` and check its test run; it now resolves `actions/deploy@v1` to the new action. Callers using the workflow at `@v1` also get both the workflow and action from the new tag. For the next development cycle, change the Deploy step back to `@main` in a new commit; this does not affect the released `v1` tag.
+The public workflow is `.github/workflows/deploy.yaml`. We use `main` for development and move the `v1` tag manually for stable releases.
 
 ### New major versions
 
