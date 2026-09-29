@@ -179,8 +179,8 @@ jobs:
         working-directory: ${{ steps.config.outputs.working_directory }}
         run: |
           set -euo pipefail
-          if ! uv run --no-sync python -c "import flyte" 2>/dev/null; then
-            echo "::error::'flyte' is a required dependency but is not installed. Add it to your pyproject.toml or requirements file." >&2
+          if ! .venv/bin/python -c "import flyte"; then
+            echo "::error::Unable to import 'flyte' from the task environment. Check the dependencies and the error above." >&2
             exit 1
           fi
 
@@ -212,7 +212,7 @@ jobs:
           UNION_DOMAIN: ${{ inputs.union-domain }}
         run: |
           set -euo pipefail
-          uv run --no-sync flyte create config --project "$UNION_PROJECT" --domain "$UNION_DOMAIN" --builder remote --force
+          .venv/bin/flyte create config --project "$UNION_PROJECT" --domain "$UNION_DOMAIN" --builder remote --force
 
       - name: Deploy
         shell: bash
@@ -228,7 +228,7 @@ jobs:
           fi
           args+=("$FLYTE_TASK_FILE")
 
-          uv run --no-sync flyte deploy "${args[@]}"
+          .venv/bin/flyte deploy "${args[@]}"
 
       - name: Clear flyte API key
         if: always()
