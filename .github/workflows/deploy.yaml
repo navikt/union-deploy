@@ -181,7 +181,7 @@ jobs:
               rm -f uv.lock
             fi
 
-            args=(sync)
+            args=(sync --active)
             if [[ -n "$PYPROJECT_GROUPS" ]]; then
               IFS=, read -r -a groups <<< "$PYPROJECT_GROUPS"
               for group in "${groups[@]}"; do
