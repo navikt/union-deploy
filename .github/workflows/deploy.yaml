@@ -15,6 +15,10 @@ on:
         description: "Path to either requirements.txt or pyproject.toml"
         required: true
         type: string
+      pyproject-groups:
+        description: "The dependency groups, in the pyproject.toml, the task uses, comma separated list (e.g., foo,bar,baz)"
+        required: false
+        type: string
       union-project:
         description: ""
         required: true
@@ -55,6 +59,7 @@ jobs:
           FLYTE_TASK_FILE: ${{ inputs.flyte-task-file }}
           FLYTE_TASK_VERSION: ${{ inputs.flyte-task-version }}
           PYTHON_VERSION: ${{ inputs.python-version }}
+          PYPROJECT_GROUPS: ${{ inputs.pyproject-groups }}
         run: |
           set -euo pipefail
 
@@ -102,6 +107,15 @@ jobs:
             #fi
           fi
 
+          if [[ -n "$PYPROJECT_GROUPS" ]]; then
+            if [[ "$dependency_file_basename" != "pyproject.toml" ]]; then
+              errors+=("pyproject-groups requires a pyproject.toml dependency-file")
+            fi
+            if [[ ! "$PYPROJECT_GROUPS" =~ ^[A-Za-z0-9._-]+(,[A-Za-z0-9._-]+)*$ ]]; then
+              errors+=("Invalid pyproject-groups: use comma-separated, nonempty group names")
+            fi
+          fi
+
           if [[ -n "$PYTHON_VERSION" && ! "$PYTHON_VERSION" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
             errors+=("Invalid python-version '$PYTHON_VERSION' - must be in the form 'X.Y' or 'X.Y.Z'.")
           fi
@@ -120,6 +134,7 @@ jobs:
           repo="${REPOSITORY##*/}"
           # GSA account_id is capped at 30 chars; terraform truncates the repo to 26 ("ud-" prefix = 3).
           sa_repo="${repo:0:26}"
+
 
           {
             echo "provider=${provider}"
@@ -145,7 +160,7 @@ jobs:
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
-          
+
       - name: Install workflow dependencies
         shell: bash
         working-directory: ${{ steps.config.outputs.working_directory }}
@@ -155,6 +170,7 @@ jobs:
           UV_INDEX: gar=https://europe-west1-python.pkg.dev/nav-data-images-prod/pypi/simple
           UV_INDEX_GAR_USERNAME: oauth2accesstoken
           UV_INDEX_GAR_PASSWORD: ${{ steps.auth.outputs.access_token }}
+          PYPROJECT_GROUPS: ${{ inputs.pyproject-groups }}
         run: |
           set -euo pipefail
 
@@ -164,7 +180,16 @@ jobs:
             if [[ -f uv.lock ]]; then 
               rm -f uv.lock
             fi
-            uv sync
+
+            args=(sync)
+            if [[ -n "$PYPROJECT_GROUPS" ]]; then
+              IFS=, read -r -a groups <<< "$PYPROJECT_GROUPS"
+              for group in "${groups[@]}"; do
+                args+=(--group "$group")
+              done
+            fi
+
+            uv "${args[@]}"
           else
             if [ -n "$PYTHON_VERSION" ]; then
               uv venv --python "$PYTHON_VERSION"
@@ -173,7 +198,7 @@ jobs:
             fi
             uv pip install -r "$dependency_file_basename"
           fi
-      
+
       - name: Verify flyte is installed
         shell: bash
         working-directory: ${{ steps.config.outputs.working_directory }}
@@ -203,7 +228,7 @@ jobs:
           echo "::add-mask::$flyte_api_key_b64"
 
           echo "FLYTE_API_KEY=$flyte_api_key_b64" >> "$GITHUB_ENV"
-      
+
       - name: Create flyte config
         shell: bash
         working-directory: ${{ steps.config.outputs.working_directory }}
