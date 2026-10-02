@@ -178,7 +178,7 @@ jobs:
 
           if [ "$dependency_file_basename" = "pyproject.toml" ]; then
             if [[ -f uv.lock ]]; then 
-              rm -f uv.lock
+              uv lock --refresh
             fi
 
             args=(sync)
