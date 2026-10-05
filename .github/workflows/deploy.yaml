@@ -36,6 +36,11 @@ on:
         description: "Python version to use for the virtual environment. Only relevant if not using pyproject.toml."
         required: false
         type: string
+      working-directory:
+        description: "Working directory for the task."
+        required: false
+        type: string
+        default: "."
 
 jobs:
   deploy-union-task:
@@ -140,7 +145,6 @@ jobs:
             echo "provider=${provider}"
             echo "flyte_api_key_secret=union-api-key-${UNION_PROJECT}"
             echo "flyte_task_file=$(realpath "${FLYTE_TASK_FILE}")"
-            echo "working_directory=$(dirname "${DEPENDENCY_FILE}")"
             echo "gcp_project=nav-data-union-restricted-${ENVIRONMENT}"
             echo "service_account=ud-${sa_repo}@nav-data-union-restricted-${ENVIRONMENT}.iam.gserviceaccount.com"
           } >> "$GITHUB_OUTPUT"
@@ -163,7 +167,7 @@ jobs:
 
       - name: Install workflow dependencies
         shell: bash
-        working-directory: ${{ steps.config.outputs.working_directory }}
+        working-directory: ${{ inputs.working-directory }}
         env:
           DEPENDENCY_FILE: ${{ inputs.dependency-file }}
           PYTHON_VERSION: ${{ inputs.python-version }}
@@ -175,13 +179,14 @@ jobs:
           set -euo pipefail
 
           dependency_file_basename="$(basename "$DEPENDENCY_FILE")"
+          dependency_file_dir="$(dirname "$DEPENDENCY_FILE")"
 
           if [ "$dependency_file_basename" = "pyproject.toml" ]; then
-            if [[ -f uv.lock ]]; then 
-              rm -f uv.lock
+            if [[ -f "$dependency_file_dir/uv.lock" ]]; then 
+              rm -f "$dependency_file_dir/uv.lock"
             fi
 
-            args=(sync)
+            args=(sync --project "$dependency_file_dir")
             if [[ -n "$PYPROJECT_GROUPS" ]]; then
               IFS=, read -r -a groups <<< "$PYPROJECT_GROUPS"
               for group in "${groups[@]}"; do
@@ -190,21 +195,29 @@ jobs:
             fi
 
             uv "${args[@]}"
+            venv_path="$dependency_file_dir/.venv"
           else
             if [ -n "$PYTHON_VERSION" ]; then
               uv venv --python "$PYTHON_VERSION"
             else
               uv venv
             fi
-            uv pip install -r "$dependency_file_basename"
+            uv pip install -r "$DEPENDENCY_FILE"
+            venv_path="$PWD/.venv"
           fi
+
+          {
+            echo "venv_path=${venv_path}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Verify flyte is installed
         shell: bash
-        working-directory: ${{ steps.config.outputs.working_directory }}
+        working-directory: ${{ inputs.working-directory }}
+        env:
+          VENV_PATH: ${{ steps.setup.outputs.venv_path }}
         run: |
           set -euo pipefail
-          if ! .venv/bin/python -c "import flyte"; then
+          if ! "$VENV_PATH/bin/python" -c "import flyte"; then
             echo "::error::Unable to import 'flyte' from the task environment. Check the dependencies and the error above." >&2
             exit 1
           fi
@@ -231,18 +244,20 @@ jobs:
 
       - name: Create flyte config
         shell: bash
-        working-directory: ${{ steps.config.outputs.working_directory }}
+        working-directory: ${{ inputs.working-directory }}
         env:
+          VENV_PATH: ${{ steps.setup.outputs.venv_path }}
           UNION_PROJECT: ${{ inputs.union-project }}
           UNION_DOMAIN: ${{ inputs.union-domain }}
         run: |
           set -euo pipefail
-          .venv/bin/flyte create config --project "$UNION_PROJECT" --domain "$UNION_DOMAIN" --builder remote --force
+          "$VENV_PATH/bin/flyte" create config --project "$UNION_PROJECT" --domain "$UNION_DOMAIN" --builder remote --force
 
       - name: Deploy
         shell: bash
         working-directory: ${{ steps.config.outputs.working_directory }}
         env:
+          VENV_PATH: ${{ steps.setup.outputs.venv_path }}
           FLYTE_TASK_FILE: ${{ steps.config.outputs.flyte_task_file }}
           FLYTE_TASK_VERSION: ${{ inputs.flyte-task-version }}
         run: |
@@ -253,7 +268,7 @@ jobs:
           fi
           args+=("$FLYTE_TASK_FILE")
 
-          .venv/bin/flyte deploy "${args[@]}"
+          "$VENV_PATH/bin/flyte" deploy "${args[@]}"
 
       - name: Clear flyte API key
         if: always()
