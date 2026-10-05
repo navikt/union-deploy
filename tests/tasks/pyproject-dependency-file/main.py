@@ -18,7 +18,7 @@ env = flyte.TaskEnvironment(
         }
     )
     .with_uv_project(
-        pyproject_file="pyproject.toml",
+        pyproject_file="tests/tasks/pyproject-dependency-file/pyproject.toml",
         index_url=(
             "https://oauth2accesstoken@"
             "europe-west1-python.pkg.dev/nav-data-images-prod/pypi/simple/"

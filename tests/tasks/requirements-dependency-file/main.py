@@ -17,7 +17,7 @@ env = flyte.TaskEnvironment(
         }
     )
     .with_requirements(
-        file="requirements.txt",
+        file="tests/tasks/requirements-dependency-file/requirements.txt",
         index_url=(
             "https://oauth2accesstoken@"
             "europe-west1-python.pkg.dev/nav-data-images-prod/pypi/simple/"
