@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       flyte-task-file:
-        description: "Path to the task file (e.g., ./mytasks/task.py)"
+        description: "Path to the task file, relative to working-directory (e.g., ./mytasks/task.py)."
         required: true
         type: string
       flyte-task-version:
@@ -12,11 +12,11 @@ on:
         required: false
         type: string
       dependency-file:
-        description: "Path to either requirements.txt or pyproject.toml"
+        description: "Path to pyproject.toml or a requirements*.txt file, relative to working-directory."
         required: true
         type: string
       pyproject-groups:
-        description: "The dependency groups, in the pyproject.toml, the task uses, comma separated list (e.g., foo,bar,baz)"
+        description: "Comma-separated pyproject.toml dependency groups to install alongside project dependencies and uv's default groups (e.g., foo,bar,baz)."
         required: false
         type: string
       union-project:
@@ -37,7 +37,7 @@ on:
         required: false
         type: string
       working-directory:
-        description: "Working directory for the task."
+        description: "Directory relative to the repository root used for validation, installation, config creation, and deployment. Task and dependency file paths are relative to this directory."
         required: false
         type: string
         default: "."
