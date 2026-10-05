@@ -21,8 +21,8 @@ jobs:
       id-token: write
     uses: ./.github/workflows/deploy.yaml
     with:
-      flyte-task-file: ./test/tasks/pyproject-dependency-file/main.py
-      dependency-file: ./test/tasks/pyproject-dependency-file/pyproject.toml
+      flyte-task-file: ./tests/tasks/pyproject-dependency-file/main.py
+      dependency-file: ./tests/tasks/pyproject-dependency-file/pyproject.toml
       union-project: dataplattform
       union-domain: production
       environment: dev
@@ -32,7 +32,7 @@ jobs:
       id-token: write
     uses: ./.github/workflows/deploy.yaml
     with:
-      working-directory: ./test/tasks/pyproject-groups
+      working-directory: ./tests/tasks/pyproject-groups
       flyte-task-file: pytest_task.py
       dependency-file: pyproject.toml
       union-project: dataplattform
@@ -45,7 +45,7 @@ jobs:
       id-token: write
     uses: ./.github/workflows/deploy.yaml
     with:
-      working-directory: ./test/tasks/pyproject-groups
+      working-directory: ./tests/tasks/pyproject-groups
       flyte-task-file: numpy_pytest_task.py
       dependency-file: pyproject.toml
       union-project: dataplattform
@@ -58,9 +58,9 @@ jobs:
       id-token: write
     uses: ./.github/workflows/deploy.yaml
     with:
-      flyte-task-file: ./test/tasks/pyproject-dependency-file/main.py
+      flyte-task-file: ./tests/tasks/pyproject-dependency-file/main.py
       flyte-task-version: 0.0.3
-      dependency-file: ./test/tasks/pyproject-dependency-file/pyproject.toml
+      dependency-file: ./tests/tasks/pyproject-dependency-file/pyproject.toml
       union-project: dataplattform
       union-domain: development
       environment: dev
@@ -70,8 +70,8 @@ jobs:
       id-token: write
     uses: ./.github/workflows/deploy.yaml
     with:
-      flyte-task-file: ./test/tasks/container-task/main.py
-      dependency-file: ./test/tasks/container-task/pyproject.toml
+      flyte-task-file: ./tests/tasks/container-task/main.py
+      dependency-file: ./tests/tasks/container-task/pyproject.toml
       union-project: dataplattform
       union-domain: development
       environment: dev
@@ -81,8 +81,8 @@ jobs:
       id-token: write
     uses: ./.github/workflows/deploy.yaml
     with:
-      flyte-task-file: ./test/tasks/requirements-dependency-file/main.py
-      dependency-file: ./test/tasks/requirements-dependency-file/requirements.txt
+      flyte-task-file: ./tests/tasks/requirements-dependency-file/main.py
+      dependency-file: ./tests/tasks/requirements-dependency-file/requirements.txt
       union-project: dataplattform
       union-domain: staging
       environment: dev
@@ -92,8 +92,8 @@ jobs:
       id-token: write
     uses: ./.github/workflows/deploy.yaml
     with:
-      flyte-task-file: ./test/tasks/requirements-dependency-file/main.py
-      dependency-file: ./test/tasks/requirements-dependency-file/requirements.txt
+      flyte-task-file: ./tests/tasks/requirements-dependency-file/main.py
+      dependency-file: ./tests/tasks/requirements-dependency-file/requirements.txt
       union-project: dataplattform
       union-domain: development
       environment: dev
@@ -112,8 +112,8 @@ jobs:
       id-token: write
     uses: ./.github/workflows/deploy.yaml
     with:
-      flyte-task-file: ./test/tasks/pyproject-dependency-file/main.py
-      dependency-file: ./test/tasks/pyproject-dependency-file/pyproject.toml
+      flyte-task-file: ./tests/tasks/pyproject-dependency-file/main.py
+      dependency-file: ./tests/tasks/pyproject-dependency-file/pyproject.toml
       union-project: dataplattform
       union-domain: production
       environment: prod
@@ -131,8 +131,8 @@ jobs:
       id-token: write
     uses: ./.github/workflows/deploy.yaml
     with:
-      flyte-task-file: ./test/tasks/container-task/main.py
-      dependency-file: ./test/tasks/container-task/pyproject.toml
+      flyte-task-file: ./tests/tasks/container-task/main.py
+      dependency-file: ./tests/tasks/container-task/pyproject.toml
       union-project: dataplattform
       union-domain: development
       environment: prod
@@ -150,8 +150,8 @@ jobs:
       id-token: write
     uses: ./.github/workflows/deploy.yaml
     with:
-      flyte-task-file: ./test/tasks/requirements-dependency-file/main.py
-      dependency-file: ./test/tasks/requirements-dependency-file/requirements.txt
+      flyte-task-file: ./tests/tasks/requirements-dependency-file/main.py
+      dependency-file: ./tests/tasks/requirements-dependency-file/requirements.txt
       union-project: dataplattform
       union-domain: staging
       environment: prod
@@ -169,8 +169,8 @@ jobs:
       id-token: write
     uses: ./.github/workflows/deploy.yaml
     with:
-      flyte-task-file: ./test/tasks/requirements-dependency-file/main.py
-      dependency-file: ./test/tasks/requirements-dependency-file/requirements.txt
+      flyte-task-file: ./tests/tasks/requirements-dependency-file/main.py
+      dependency-file: ./tests/tasks/requirements-dependency-file/requirements.txt
       union-project: dataplattform
       union-domain: development
       environment: prod
@@ -189,9 +189,9 @@ jobs:
       id-token: write
     uses: ./.github/workflows/deploy.yaml
     with:
-      flyte-task-file: ./test/tasks/pyproject-dependency-file/main.py
+      flyte-task-file: ./tests/tasks/pyproject-dependency-file/main.py
       flyte-task-version: 0.0.3
-      dependency-file: ./test/tasks/pyproject-dependency-file/pyproject.toml
+      dependency-file: ./tests/tasks/pyproject-dependency-file/pyproject.toml
       union-project: dataplattform
       union-domain: development
       environment: prod
