@@ -182,6 +182,7 @@ jobs:
 
           dependency_file_basename="$(basename "$DEPENDENCY_FILE")"
           dependency_file_dir="$(dirname "$DEPENDENCY_FILE")"
+          venv_path="$RUNNER_TEMP/union-deploy-venv"
 
           if [ "$dependency_file_basename" = "pyproject.toml" ]; then
             if [[ -f "$dependency_file_dir/uv.lock" ]]; then 
@@ -196,16 +197,14 @@ jobs:
               done
             fi
 
-            uv "${args[@]}"
-            venv_path="$dependency_file_dir/.venv"
+            UV_PROJECT_ENVIRONMENT="$venv_path" uv "${args[@]}"
           else
+            args=(venv "$venv_path")
             if [ -n "$PYTHON_VERSION" ]; then
-              uv venv --python "$PYTHON_VERSION"
-            else
-              uv venv
+              args+=(--python "$PYTHON_VERSION")
             fi
-            uv pip install -r "$DEPENDENCY_FILE"
-            venv_path="$PWD/.venv"
+            uv "${args[@]}"
+            uv pip install --python "$venv_path/bin/python" -r "$DEPENDENCY_FILE"
           fi
 
           {
