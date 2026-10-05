@@ -257,7 +257,7 @@ jobs:
 
       - name: Deploy
         shell: bash
-        working-directory: ${{ steps.config.outputs.working_directory }}
+        working-directory: ${{ inputs.working-directory }}
         env:
           VENV_PATH: ${{ steps.install.outputs.venv_path }}
           FLYTE_TASK_FILE: ${{ steps.config.outputs.flyte_task_file }}
