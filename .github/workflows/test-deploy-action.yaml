@@ -32,8 +32,9 @@ jobs:
       id-token: write
     uses: ./.github/workflows/deploy.yaml
     with:
-      flyte-task-file: ./test/tasks/pyproject-groups/pytest_task.py
-      dependency-file: ./test/tasks/pyproject-groups/pyproject.toml
+      working-directory: ./test/tasks/pyproject-groups
+      flyte-task-file: pytest_task.py
+      dependency-file: pyproject.toml
       union-project: dataplattform
       union-domain: development
       environment: dev
@@ -44,8 +45,9 @@ jobs:
       id-token: write
     uses: ./.github/workflows/deploy.yaml
     with:
-      flyte-task-file: ./test/tasks/pyproject-groups/numpy_pytest_task.py
-      dependency-file: ./test/tasks/pyproject-groups/pyproject.toml
+      working-directory: ./test/tasks/pyproject-groups
+      flyte-task-file: numpy_pytest_task.py
+      dependency-file: pyproject.toml
       union-project: dataplattform
       union-domain: development
       environment: dev
