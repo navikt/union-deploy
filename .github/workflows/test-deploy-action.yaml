@@ -103,6 +103,8 @@ jobs:
       - requirements-dev
       - python-version-dev
       - flyte-task-version-dev
+      - pyproject-single-group-dev
+      - pyproject-multiple-groups-dev
     permissions:
       contents: read
       id-token: write
@@ -120,6 +122,8 @@ jobs:
       - requirements-dev
       - python-version-dev
       - flyte-task-version-dev
+      - pyproject-single-group-dev
+      - pyproject-multiple-groups-dev
     permissions:
       contents: read
       id-token: write
@@ -137,6 +141,8 @@ jobs:
       - requirements-dev
       - python-version-dev
       - flyte-task-version-dev
+      - pyproject-single-group-dev
+      - pyproject-multiple-groups-dev
     permissions:
       contents: read
       id-token: write
@@ -154,6 +160,8 @@ jobs:
       - requirements-dev
       - python-version-dev
       - flyte-task-version-dev
+      - pyproject-single-group-dev
+      - pyproject-multiple-groups-dev
     permissions:
       contents: read
       id-token: write
@@ -172,6 +180,8 @@ jobs:
       - requirements-dev
       - python-version-dev
       - flyte-task-version-dev
+      - pyproject-single-group-dev
+      - pyproject-multiple-groups-dev
     permissions:
       contents: read
       id-token: write
