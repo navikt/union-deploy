@@ -166,6 +166,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
 
       - name: Install workflow dependencies
+        id: install
         shell: bash
         working-directory: ${{ inputs.working-directory }}
         env:
@@ -214,7 +215,7 @@ jobs:
         shell: bash
         working-directory: ${{ inputs.working-directory }}
         env:
-          VENV_PATH: ${{ steps.setup.outputs.venv_path }}
+          VENV_PATH: ${{ steps.install.outputs.venv_path }}
         run: |
           set -euo pipefail
           if ! "$VENV_PATH/bin/python" -c "import flyte"; then
@@ -246,7 +247,7 @@ jobs:
         shell: bash
         working-directory: ${{ inputs.working-directory }}
         env:
-          VENV_PATH: ${{ steps.setup.outputs.venv_path }}
+          VENV_PATH: ${{ steps.install.outputs.venv_path }}
           UNION_PROJECT: ${{ inputs.union-project }}
           UNION_DOMAIN: ${{ inputs.union-domain }}
         run: |
@@ -257,7 +258,7 @@ jobs:
         shell: bash
         working-directory: ${{ steps.config.outputs.working_directory }}
         env:
-          VENV_PATH: ${{ steps.setup.outputs.venv_path }}
+          VENV_PATH: ${{ steps.install.outputs.venv_path }}
           FLYTE_TASK_FILE: ${{ steps.config.outputs.flyte_task_file }}
           FLYTE_TASK_VERSION: ${{ inputs.flyte-task-version }}
         run: |
