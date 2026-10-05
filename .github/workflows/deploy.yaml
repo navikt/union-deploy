@@ -55,6 +55,7 @@ jobs:
       - id: config
         name: Validate inputs and resolve environment configuration
         shell: bash
+        working-directory: ${{ inputs.working-directory }}
         env:
           ENVIRONMENT: ${{ inputs.environment }}
           UNION_PROJECT: ${{ inputs.union-project }}
