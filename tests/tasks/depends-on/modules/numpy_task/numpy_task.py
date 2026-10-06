@@ -1,6 +1,8 @@
 import flyte
 import numpy
 
+PYPI_PROXY_INDEX_URL = "europe-west1-python.pkg.dev/nav-data-images-prod/pypi/simple/"
+
 numpy_env = flyte.TaskEnvironment(
     name="test_requirements_deploy_numpy",
     image=flyte.Image.from_base(
@@ -14,13 +16,13 @@ numpy_env = flyte.TaskEnvironment(
     .with_env_vars(
         {
             "UV_KEYRING_PROVIDER": "subprocess",
+            "UV_DEFAULT_INDEX": f"https://oauth2accesstoken@{PYPI_PROXY_INDEX_URL}",
         }
     )
     .with_uv_project(
         "./pyproject.toml",
         extra_args="--group numpy-task"
     )
-    .with_code_bundle('loaded_modules'),
 )
 
 @numpy_env.task(entrypoint=True)
