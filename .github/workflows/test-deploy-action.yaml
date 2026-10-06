@@ -52,6 +52,19 @@ jobs:
       union-domain: development
       environment: dev
       pyproject-groups: pytest-task,numpy-task
+  multiple-environments-dev:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      working-directory: ./tests/tasks/multiple-environments
+      flyte-task-file: task/main.py
+      dependency-file: pyproject.toml
+      union-project: dataplattform
+      union-domain: development
+      environment: dev
+      pyproject-groups: pytest-task,numpy-task
   pyproject-workspace-dev:
     permissions:
       contents: read
