@@ -1,0 +1,27 @@
+[project]
+name = "depends-on"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "ankjel", email = "anna.sofie.kjelstrup@nav.no" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "flyte>=2.10.6",
+]
+
+[project.scripts]
+depends-on = "depends_on:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+numpy-task = [
+    "numpy>=2.2.6",
+]
+pytest-task = [
+    "pytest>=9.1.1",
+]
