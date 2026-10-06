@@ -5,7 +5,7 @@ from modules.numpy_task.numpy_task import numpy_env, numpy_task
 PYPI_PROXY_INDEX_URL = "europe-west1-python.pkg.dev/nav-data-images-prod/pypi/simple/"
 
 env = flyte.TaskEnvironment(
-    name="test_requirements_deploy_pytest",
+    name="test_multiple_environments",
     image=flyte.Image.from_base(
         image_uri="europe-west1-docker.pkg.dev/nav-data-images-prod/nav-union-images/flyte:3.13-base"
     )
