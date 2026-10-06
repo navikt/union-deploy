@@ -18,7 +18,7 @@ numpy_env = flyte.TaskEnvironment(
     )
     .with_uv_project(
         "./pyproject.toml",
-        extra_args="--group pytest-numpy"
+        extra_args="--group numpy-task"
     )
     .with_code_bundle('loaded_modules'),
 )
