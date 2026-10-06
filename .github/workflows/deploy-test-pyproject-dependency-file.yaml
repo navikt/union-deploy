@@ -1,0 +1,41 @@
+name: Deploy test pyproject dependency file
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/deploy.yaml
+      - tests/tasks/pyproject-dependency-file/**
+      - .github/workflows/deploy-test-pyproject-dependency-file.yaml
+  pull_request:
+    paths:
+      - .github/workflows/deploy.yaml
+      - tests/tasks/pyproject-dependency-file/**
+      - .github/workflows/deploy-test-pyproject-dependency-file.yaml
+  workflow_dispatch:
+
+jobs:
+  deploy-dev:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      flyte-task-file: ./tests/tasks/pyproject-dependency-file/main.py
+      dependency-file: ./tests/tasks/pyproject-dependency-file/pyproject.toml
+      union-project: dataplattform
+      union-domain: production
+      environment: dev
+  deploy-prod:
+    needs: deploy-dev
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      flyte-task-file: ./tests/tasks/pyproject-dependency-file/main.py
+      dependency-file: ./tests/tasks/pyproject-dependency-file/pyproject.toml
+      union-project: dataplattform
+      union-domain: production
+      environment: prod

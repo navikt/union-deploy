@@ -1,0 +1,43 @@
+name: Deploy test pyproject workspace
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/deploy.yaml
+      - tests/tasks/pyproject-workspace/**
+      - .github/workflows/deploy-test-pyproject-workspace.yaml
+  pull_request:
+    paths:
+      - .github/workflows/deploy.yaml
+      - tests/tasks/pyproject-workspace/**
+      - .github/workflows/deploy-test-pyproject-workspace.yaml
+  workflow_dispatch:
+
+jobs:
+  deploy-dev:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      working-directory: ./tests/tasks/pyproject-workspace/packages/task
+      flyte-task-file: main.py
+      dependency-file: pyproject.toml
+      union-project: dataplattform
+      union-domain: development
+      environment: dev
+  deploy-prod:
+    needs: deploy-dev
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      working-directory: ./tests/tasks/pyproject-workspace/packages/task
+      flyte-task-file: main.py
+      dependency-file: pyproject.toml
+      union-project: dataplattform
+      union-domain: development
+      environment: prod

@@ -1,0 +1,41 @@
+name: Deploy test requirements dependency file
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/deploy.yaml
+      - tests/tasks/requirements-dependency-file/**
+      - .github/workflows/deploy-test-requirements-dependency-file.yaml
+  pull_request:
+    paths:
+      - .github/workflows/deploy.yaml
+      - tests/tasks/requirements-dependency-file/**
+      - .github/workflows/deploy-test-requirements-dependency-file.yaml
+  workflow_dispatch:
+
+jobs:
+  deploy-dev:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      flyte-task-file: ./tests/tasks/requirements-dependency-file/main.py
+      dependency-file: ./tests/tasks/requirements-dependency-file/requirements.txt
+      union-project: dataplattform
+      union-domain: staging
+      environment: dev
+  deploy-prod:
+    needs: deploy-dev
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      flyte-task-file: ./tests/tasks/requirements-dependency-file/main.py
+      dependency-file: ./tests/tasks/requirements-dependency-file/requirements.txt
+      union-project: dataplattform
+      union-domain: staging
+      environment: prod

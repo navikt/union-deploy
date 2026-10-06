@@ -1,0 +1,72 @@
+name: Deploy test pyproject groups
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/deploy.yaml
+      - tests/tasks/pyproject-groups/**
+      - .github/workflows/deploy-test-pyproject-groups.yaml
+  pull_request:
+    paths:
+      - .github/workflows/deploy.yaml
+      - tests/tasks/pyproject-groups/**
+      - .github/workflows/deploy-test-pyproject-groups.yaml
+  workflow_dispatch:
+
+jobs:
+  single-group-dev:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      working-directory: ./tests/tasks/pyproject-groups
+      flyte-task-file: pytest_task.py
+      dependency-file: pyproject.toml
+      union-project: dataplattform
+      union-domain: development
+      environment: dev
+      pyproject-groups: pytest-task
+  multiple-groups-dev:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      working-directory: ./tests/tasks/pyproject-groups
+      flyte-task-file: numpy_pytest_task.py
+      dependency-file: pyproject.toml
+      union-project: dataplattform
+      union-domain: development
+      environment: dev
+      pyproject-groups: pytest-task,numpy-task
+  single-group-prod:
+    needs: single-group-dev
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      working-directory: ./tests/tasks/pyproject-groups
+      flyte-task-file: pytest_task.py
+      dependency-file: pyproject.toml
+      union-project: dataplattform
+      union-domain: development
+      environment: prod
+      pyproject-groups: pytest-task
+  multiple-groups-prod:
+    needs: multiple-groups-dev
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      working-directory: ./tests/tasks/pyproject-groups
+      flyte-task-file: numpy_pytest_task.py
+      dependency-file: pyproject.toml
+      union-project: dataplattform
+      union-domain: development
+      environment: prod
+      pyproject-groups: pytest-task,numpy-task

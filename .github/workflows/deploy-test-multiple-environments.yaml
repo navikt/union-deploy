@@ -1,0 +1,45 @@
+name: Deploy test multiple environments
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/deploy.yaml
+      - tests/tasks/multiple-environments/**
+      - .github/workflows/deploy-test-multiple-environments.yaml
+  pull_request:
+    paths:
+      - .github/workflows/deploy.yaml
+      - tests/tasks/multiple-environments/**
+      - .github/workflows/deploy-test-multiple-environments.yaml
+  workflow_dispatch:
+
+jobs:
+  deploy-dev:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      working-directory: ./tests/tasks/multiple-environments
+      flyte-task-file: task/main.py
+      dependency-file: pyproject.toml
+      union-project: dataplattform
+      union-domain: development
+      environment: dev
+      pyproject-groups: pytest-task,numpy-task
+  deploy-prod:
+    needs: deploy-dev
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      working-directory: ./tests/tasks/multiple-environments
+      flyte-task-file: task/main.py
+      dependency-file: pyproject.toml
+      union-project: dataplattform
+      union-domain: development
+      environment: prod
+      pyproject-groups: pytest-task,numpy-task
