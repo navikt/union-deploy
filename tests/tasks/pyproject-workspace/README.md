@@ -1,10 +1,7 @@
-# Workspace member fixture
+# pyproject-workspace
 
-The deploy workflow runs from `packages/task` and receives the member's
-`pyproject.toml`, not the workspace root's. Without an explicit environment path,
-uv creates `.venv` at the workspace root, so looking beside the member's
-`pyproject.toml` fails.
+Tester deploy av en task fra et medlem i et uv-workspace.
 
-Flyte is declared only in the member to verify that its dependencies are installed.
-The task uses a prebuilt image so this fixture tests the deployment environment
-without requiring the remote builder to package a uv workspace.
+- CI kjører fra `packages/task` og bruker medlemmets `pyproject.toml`, ikke fila i roten av workspacet.
+- Medlemmets `pyproject.toml` oppgir Flyte som avhengighet. Tasken bruker et ferdigbygd image, så testen krever ikke at den eksterne image-byggeren pakker workspacet.
+- CI deployer eksempelet til dev og prod: [workflow](../../../.github/workflows/deploy-test-pyproject-workspace.yaml).
