@@ -7,11 +7,13 @@ on:
     paths:
       - .github/workflows/deploy.yaml
       - tests/tasks/multiple-environments/**
+      - '!tests/tasks/multiple-environments/**/*.md'
       - .github/workflows/deploy-test-multiple-environments.yaml
   pull_request:
     paths:
       - .github/workflows/deploy.yaml
       - tests/tasks/multiple-environments/**
+      - '!tests/tasks/multiple-environments/**/*.md'
       - .github/workflows/deploy-test-multiple-environments.yaml
   workflow_dispatch:
 

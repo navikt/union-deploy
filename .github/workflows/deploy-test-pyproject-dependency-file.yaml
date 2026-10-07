@@ -7,11 +7,13 @@ on:
     paths:
       - .github/workflows/deploy.yaml
       - tests/tasks/pyproject-dependency-file/**
+      - '!tests/tasks/pyproject-dependency-file/**/*.md'
       - .github/workflows/deploy-test-pyproject-dependency-file.yaml
   pull_request:
     paths:
       - .github/workflows/deploy.yaml
       - tests/tasks/pyproject-dependency-file/**
+      - '!tests/tasks/pyproject-dependency-file/**/*.md'
       - .github/workflows/deploy-test-pyproject-dependency-file.yaml
   workflow_dispatch:
 

@@ -7,11 +7,13 @@ on:
     paths:
       - .github/workflows/deploy.yaml
       - tests/tasks/container-task/**
+      - '!tests/tasks/container-task/**/*.md'
       - .github/workflows/deploy-test-container-task.yaml
   pull_request:
     paths:
       - .github/workflows/deploy.yaml
       - tests/tasks/container-task/**
+      - '!tests/tasks/container-task/**/*.md'
       - .github/workflows/deploy-test-container-task.yaml
   workflow_dispatch:
 
