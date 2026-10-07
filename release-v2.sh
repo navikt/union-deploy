@@ -3,7 +3,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-tag=v1
+tag=v2
 
 if [[ -n "$(git status --porcelain)" ]]; then
   echo "Commit or remove worktree changes before releasing $tag." >&2
