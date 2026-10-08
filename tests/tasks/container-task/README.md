@@ -2,7 +2,7 @@
 
 ## Når passer dette oppsettet?
 
-Bruk dette når du vil kjøre en kommando i et eget container-image og kalle den fra en Python-task. Containeren kan ha andre verktøy og avhengigheter enn Python-tasken.
+Bruk dette oppsettet når du vil kjøre en kommando i et eget container-image og kalle den fra flyte. Containeren kan ha andre verktøy og avhengigheter enn Python-tasken.
 
 ## Slik fungerer eksempelet
 
