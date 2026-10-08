@@ -24,7 +24,6 @@ env = flyte.TaskEnvironment(
         "./pyproject.toml",
         extra_args="--group pytest-task"
     )
-    .with_code_bundle('loaded_modules')
 )
 
 @env.task(entrypoint=True)

@@ -7,7 +7,7 @@ Bruk dette når prosjektet har avhengigheter i `[dependency-groups]` i `pyprojec
 ## Slik fungerer eksempelet
 
 - [pyproject.toml](pyproject.toml) har `flyte` i prosjektets vanlige avhengigheter, og gruppene `pytest-task` og `numpy-task`.
-- [pytest_task.py](pytest_task.py) importerer `pytest` og velger gruppen `pytest-task` i image-definisjonen. Den viser også `.with_code_bundle("loaded_modules")` for kodepakking.
+- [pytest_task.py](pytest_task.py) importerer `pytest` og velger gruppen `pytest-task` i image-definisjonen.
 - [numpy_pytest_task.py](numpy_pytest_task.py) importerer både `numpy` og `pytest` og velger begge gruppene i image-definisjonen.
 - CI velger de tilsvarende gruppene med inputen `pyproject-groups`, slik at task-filene kan importeres under deploy.
 
