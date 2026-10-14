@@ -164,9 +164,6 @@ jobs:
           workload_identity_provider: ${{ steps.config.outputs.provider }}
           service_account: ${{ steps.config.outputs.service_account }}
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
-
       - name: Install workflow dependencies
         id: install
         shell: bash
@@ -225,24 +222,12 @@ jobs:
           fi
 
       - name: Get flyte API key
-        shell: bash
-        env:
-          FLYTE_API_KEY_SECRET: ${{ steps.config.outputs.flyte_api_key_secret }}
-          PROJECT: ${{ steps.config.outputs.gcp_project }}
-        run: |
-          set -euo pipefail
-
-          flyte_api_key="$(gcloud secrets versions access latest \
-            --secret="$FLYTE_API_KEY_SECRET" \
-            --project "$PROJECT")"
-
-          flyte_api_key_b64="$(printf '%s' "$flyte_api_key" | base64 | tr -d '\n')"
-
-          # Mask both the raw and base64-encoded values in logs before exporting.
-          echo "::add-mask::$flyte_api_key"
-          echo "::add-mask::$flyte_api_key_b64"
-
-          echo "FLYTE_API_KEY=$flyte_api_key_b64" >> "$GITHUB_ENV"
+        uses: google-github-actions/get-secretmanager-secrets@bc9c54b29fdffb8a47776820a7d26e77b379d262 # v3.0.0
+        with:
+          secrets: |-
+            FLYTE_API_KEY:${{ steps.config.outputs.gcp_project }}/${{ steps.config.outputs.flyte_api_key_secret }}/latest
+          encoding: base64
+          export_to_environment: true
 
       - name: Create flyte config
         shell: bash
