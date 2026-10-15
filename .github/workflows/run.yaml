@@ -108,12 +108,17 @@ jobs:
         name: Authenticate with Google Cloud
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
+          token_format: access_token
           workload_identity_provider: ${{ steps.config.outputs.provider }}
           service_account: ${{ steps.config.outputs.service_account }}
 
       - name: Install Flyte CLI
         id: install
         shell: bash
+        env:
+          UV_INDEX: gar=https://europe-west1-python.pkg.dev/nav-data-images-prod/pypi/simple
+          UV_INDEX_GAR_USERNAME: oauth2accesstoken
+          UV_INDEX_GAR_PASSWORD: ${{ steps.auth.outputs.access_token }}
         run: |
           set -euo pipefail
           venv_path="$RUNNER_TEMP/union-run-venv"
