@@ -10,11 +10,17 @@ if [[ -n "$(git status --porcelain)" ]]; then
   exit 1
 fi
 
-remote_tag="$(git ls-remote --exit-code --refs origin "refs/tags/$tag")" || {
-  echo "Cannot find $tag on origin; refusing to create a new release tag." >&2
-  exit 1
-}
-old_oid="${remote_tag%%$'\t'*}"
+if remote_tag="$(git ls-remote --exit-code --refs origin "refs/tags/$tag")"; then
+  old_oid="${remote_tag%%$'\t'*}"
+else
+  status=$?
+  if [[ "$status" -ne 2 ]]; then
+    echo "Cannot query $tag on origin; refusing to release." >&2
+    exit 1
+  fi
+  # An empty expected OID only permits creation if the remote tag is still absent.
+  old_oid=""
+fi
 commit="$(git rev-parse HEAD)"
 
 git push --force-with-lease="refs/tags/$tag:$old_oid" origin "$commit:refs/tags/$tag"

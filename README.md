@@ -67,7 +67,7 @@ From a clean, committed worktree, release the current `HEAD` with the appropriat
 ./scripts/release-run-v1.sh
 ```
 
-Run only the script for the workflow you intend to release. Both scripts update the remote tag using a force-with-lease check, then update the local tag. The run script also creates `run-v1` on its first release; the deploy script requires `v2` to already exist on origin. Tags reference the whole repository, but moving one tag does not move the other.
+Run only the script for the workflow you intend to release. Both scripts create or update the remote tag using a force-with-lease check, then update the local tag. Tags reference the whole repository, but moving one tag does not move the other.
 
 ### New major versions
 
