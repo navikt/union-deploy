@@ -6,12 +6,14 @@ on:
       - main
     paths:
       - .github/workflows/deploy.yaml
+      - .github/workflows/run.yaml
       - tests/tasks/pyproject-dependency-file/**
       - '!tests/tasks/pyproject-dependency-file/**/*.md'
       - .github/workflows/deploy-test-pyproject-dependency-file.yaml
   pull_request:
     paths:
       - .github/workflows/deploy.yaml
+      - .github/workflows/run.yaml
       - tests/tasks/pyproject-dependency-file/**
       - '!tests/tasks/pyproject-dependency-file/**/*.md'
       - .github/workflows/deploy-test-pyproject-dependency-file.yaml
@@ -38,6 +40,18 @@ jobs:
     with:
       flyte-task-file: ./tests/tasks/pyproject-dependency-file/main.py
       dependency-file: ./tests/tasks/pyproject-dependency-file/pyproject.toml
+      union-project: dataplattform
+      union-domain: production
+      environment: prod
+  run-prod:
+    needs: deploy-prod
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/run.yaml
+    with:
+      task-environment: test_pyproject_deploy
+      task-name: test_pyproject_deploy.main
       union-project: dataplattform
       union-domain: production
       environment: prod

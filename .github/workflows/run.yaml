@@ -1,0 +1,152 @@
+name: Run Union Task
+
+on:
+  workflow_call:
+    inputs:
+      task-environment:
+        description: "Environment containing the deployed task (e.g., test_pyproject_deploy)."
+        required: true
+        type: string
+      task-name:
+        description: "Fully qualified name of the deployed entrypoint task (e.g., test_pyproject_deploy.main)."
+        required: true
+        type: string
+      union-project:
+        description: "Union project containing the deployed task."
+        required: true
+        type: string
+      union-domain:
+        description: "Development, staging or production"
+        required: true
+        type: string
+      environment:
+        description: "Internal, platform team only. Target GCP environment, 'dev' or 'prod'. Consumers should leave this as the default ('prod')."
+        required: false
+        default: prod
+        type: string
+
+jobs:
+  run-union-task:
+    runs-on: dataplattform-runner
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout calling repo
+        uses: actions/checkout@v4
+
+      - id: config
+        name: Validate inputs and resolve environment configuration
+        shell: bash
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+          UNION_PROJECT: ${{ inputs.union-project }}
+          UNION_DOMAIN: ${{ inputs.union-domain }}
+          REPOSITORY: ${{ github.repository }}
+          TASK_ENVIRONMENT: ${{ inputs.task-environment }}
+          TASK_NAME: ${{ inputs.task-name }}
+        run: |
+          set -euo pipefail
+
+          errors=()
+
+          case "$ENVIRONMENT" in
+            prod)
+              provider="projects/430580391891/locations/global/workloadIdentityPools/ci-dataplattform/providers/ci-dataplattform"
+              ;;
+            dev)
+              provider="projects/483437874962/locations/global/workloadIdentityPools/ci-dataplattform/providers/ci-dataplattform"
+              ;;
+            *)
+              errors+=("Invalid environment '$ENVIRONMENT' - must be 'dev' or 'prod'.")
+              ;;
+          esac
+
+          # Reject values that could inject extra lines/keys into GITHUB_OUTPUT.
+          if [[ ! "$UNION_PROJECT" =~ ^[A-Za-z0-9-]+$ ]]; then
+            errors+=("Invalid union-project '$UNION_PROJECT' - only alphanumeric characters and hyphens are allowed.")
+          fi
+
+          case "$UNION_DOMAIN" in
+            development|staging|production) ;;
+            *)
+              errors+=("Invalid union-domain '$UNION_DOMAIN' - must be 'development', 'staging' or 'production'.")
+              ;;
+          esac
+
+          if [[ -z "$TASK_ENVIRONMENT" || "$TASK_ENVIRONMENT" == -* || "$TASK_ENVIRONMENT" =~ [[:space:][:cntrl:]] ]]; then
+            errors+=("Invalid task-environment: provide a nonempty environment name without whitespace, control characters, or a leading hyphen.")
+          fi
+          if [[ -z "$TASK_NAME" || "$TASK_NAME" == -* || "$TASK_NAME" =~ [[:space:][:cntrl:]] ]]; then
+            errors+=("Invalid task-name: provide a nonempty task name without whitespace, control characters, or a leading hyphen.")
+          fi
+
+          if (( ${#errors[@]} > 0 )); then
+            for err in "${errors[@]}"; do
+              echo "::error::$err" >&2
+            done
+            exit 1
+          fi
+
+          repo="${REPOSITORY##*/}"
+          # GSA account_id is capped at 30 chars; terraform truncates the repo to 26 ("ud-" prefix = 3).
+          sa_repo="${repo:0:26}"
+
+          {
+            echo "provider=${provider}"
+            echo "flyte_api_key_secret=union-api-key-${UNION_PROJECT}"
+            echo "gcp_project=nav-data-union-restricted-${ENVIRONMENT}"
+            echo "service_account=ud-${sa_repo}@nav-data-union-restricted-${ENVIRONMENT}.iam.gserviceaccount.com"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          github-token: ${{ github.token }}
+
+      - id: auth
+        name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ steps.config.outputs.provider }}
+          service_account: ${{ steps.config.outputs.service_account }}
+
+      - name: Install Flyte CLI
+        id: install
+        shell: bash
+        run: |
+          set -euo pipefail
+          venv_path="$RUNNER_TEMP/union-run-venv"
+          uv venv --no-project "$venv_path"
+          uv pip install --python "$venv_path/bin/python" flyte
+          "$venv_path/bin/flyte" --version
+          echo "venv_path=${venv_path}" >> "$GITHUB_OUTPUT"
+
+      - id: secrets
+        name: Get flyte API key
+        uses: google-github-actions/get-secretmanager-secrets@bc9c54b29fdffb8a47776820a7d26e77b379d262 # v3.0.0
+        with:
+          secrets: |-
+            flyte_api_key:${{ steps.config.outputs.gcp_project }}/${{ steps.config.outputs.flyte_api_key_secret }}/latest
+          encoding: base64
+
+      - name: Create flyte config
+        shell: bash
+        env:
+          VENV_PATH: ${{ steps.install.outputs.venv_path }}
+          UNION_PROJECT: ${{ inputs.union-project }}
+          UNION_DOMAIN: ${{ inputs.union-domain }}
+        run: |
+          set -euo pipefail
+          "$VENV_PATH/bin/flyte" create config --project "$UNION_PROJECT" --domain "$UNION_DOMAIN" --builder remote --force
+
+      - name: Run deployed task
+        shell: bash
+        env:
+          VENV_PATH: ${{ steps.install.outputs.venv_path }}
+          FLYTE_API_KEY: ${{ steps.secrets.outputs.flyte_api_key }}
+          TASK_ENVIRONMENT: ${{ inputs.task-environment }}
+          TASK_NAME: ${{ inputs.task-name }}
+        run: |
+          set -euo pipefail
+          "$VENV_PATH/bin/flyte" run deployed-task "$TASK_ENVIRONMENT" "$TASK_NAME"
