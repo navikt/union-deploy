@@ -55,8 +55,20 @@ It can also be called independently, without the deploy job. Before use, add
 
 ## Developing and releasing
 
-The public workflow is `.github/workflows/deploy.yaml`. We use `main` for development and move the `v2` tag manually for stable releases.
+We use `main` for development and release the workflows independently using these tags:
+
+- Deploy: `navikt/union-deploy/.github/workflows/deploy.yaml@v2`
+- Run: `navikt/union-deploy/.github/workflows/run.yaml@run-v1`
+
+From a clean, committed worktree, release the current `HEAD` with the appropriate script:
+
+```bash
+./scripts/release-deploy-v2.sh
+./scripts/release-run-v1.sh
+```
+
+Run only the script for the workflow you intend to release. Both scripts update the remote tag using a force-with-lease check, then update the local tag. The run script also creates `run-v1` on its first release; the deploy script requires `v2` to already exist on origin. Tags reference the whole repository, but moving one tag does not move the other.
 
 ### New major versions
 
-Do not release backwards-incompatible changes on `v2`. For breaking changes, create a new tag such as `v3` and have callers reference `navikt/union-deploy/.github/workflows/deploy.yaml@v3` (the current release script only supports `v2`). Add the new version of the reusable workflow to the runner group's selected workflows before callers use `@v3`; otherwise the runner will refuse to pick up their jobs. Keep `v2` available for existing callers.
+Do not release backwards-incompatible changes on `v2` or `run-v1`. For breaking changes, create a new tag such as `v3` for deploy or `run-v2` for run, add a corresponding release script, and update callers to reference the new tag. Add the new version of the reusable workflow to the runner group's selected workflows before callers use it; otherwise the runner will refuse to pick up their jobs. Keep existing major tags available for existing callers.
