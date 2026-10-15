@@ -41,6 +41,11 @@ on:
         required: false
         type: string
         default: "."
+      run-task:
+        description: "Run the task when deployed"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   deploy-union-task:
@@ -67,6 +72,7 @@ jobs:
           FLYTE_TASK_VERSION: ${{ inputs.flyte-task-version }}
           PYTHON_VERSION: ${{ inputs.python-version }}
           PYPROJECT_GROUPS: ${{ inputs.pyproject-groups }}
+          RUN_TASK: ${{ inputs.run-task }}
         run: |
           set -euo pipefail
 
@@ -129,6 +135,10 @@ jobs:
 
           if [[ "$FLYTE_TASK_VERSION" =~ [[:cntrl:]] ]]; then
             errors+=("Invalid version: control characters are not allowed.")
+          fi
+          
+          if [[ "$RUN_TASK" != "true" && "$RUN_TASK" != "false" ]]; then
+            errors+=("Invalid run-task: must be a boolean (true or false).")
           fi
 
           if (( ${#errors[@]} > 0 )); then
@@ -256,6 +266,24 @@ jobs:
           args+=("$FLYTE_TASK_FILE")
 
           "$VENV_PATH/bin/flyte" deploy "${args[@]}"
+
+      - name: Run
+        working-directory: ${{ inputs.working-directory }}
+        env:
+          VENV_PATH: ${{ steps.install.outputs.venv_path }}
+          FLYTE_TASK_FILE: ${{ steps.config.outputs.flyte_task_file }}
+          FLYTE_TASK_VERSION: ${{ inputs.flyte-task-version }}
+        if: ${{inputs.run-task == true }}
+        run: |
+          set -euo pipefail
+          args=(--all)
+          if [[ -n "$FLYTE_TASK_VERSION" ]]; then
+            args+=(--version "$FLYTE_TASK_VERSION")
+          fi
+          args+=("$FLYTE_TASK_FILE")
+
+          "$VENV_PATH/bin/flyte" run "${args[@]}"
+        
 
       - name: Clear flyte API key
         if: always()
