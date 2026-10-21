@@ -89,6 +89,7 @@ jobs:
           fi
 
           repo="${REPOSITORY##*/}"
+          repo="${repo//[_.]/-}"
           # GSA account_id is capped at 30 chars; terraform truncates the repo to 26 ("ud-" prefix = 3).
           sa_repo="${repo:0:26}"
 
