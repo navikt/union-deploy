@@ -53,6 +53,22 @@ supplied to the execution step.
 It can also be called independently, without the deploy job. Before use, add
 `run.yaml` to the runner group's selected workflows where that restriction applies.
 
+## Package registry authentication
+
+Both reusable workflows install their runner-side Python dependencies through
+`https://artifacts.data.nav.no/pypi/pypi/simple/`. They request a GitHub OIDC token
+with audience `artifact-keeper` and exchange it for Artifact Keeper credentials;
+no long-lived registry secret is required in the calling repository.
+
+The calling repository must have an OIDC mapping configured in Artifact Keeper
+with read access to the PyPI repository. These mappings are managed separately
+from this repository. The runner must have `curl` and `jq` available.
+
+Artifact Keeper is configured as an additional uv index, preserving the existing
+behavior with PyPI still available as the default index. This does not change the
+registry or credentials configured in task definitions for remote image builds.
+Google Cloud authentication is still used to retrieve the Union API key.
+
 ## Developing and releasing
 
 We use `main` for development and release the workflows independently using these tags:

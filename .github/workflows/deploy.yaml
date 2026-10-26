@@ -165,6 +165,46 @@ jobs:
           workload_identity_provider: ${{ steps.config.outputs.provider }}
           service_account: ${{ steps.config.outputs.service_account }}
 
+      - name: Get Artifact Keeper OIDC token
+        id: oidc-token
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            const token = await core.getIDToken('artifact-keeper');
+            core.setSecret(token);
+            core.setOutput('token', token);
+
+      - name: Authenticate with Artifact Keeper
+        id: artifact-keeper-auth
+        shell: bash
+        env:
+          OIDC_TOKEN: ${{ steps.oidc-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          response=$(curl --fail --silent --show-error --proto '=https' --tlsv1.2 \
+            -X POST \
+            -H "Authorization: Bearer $OIDC_TOKEN" \
+            "https://artifacts.data.nav.no/api/v1/auth/ci/token")
+          if ! ak_token=$(jq --exit-status --raw-output \
+            '.access_token | select(type == "string" and length > 0)' \
+            <<< "$response" 2>/dev/null); then
+            echo "::error::Artifact Keeper returned an invalid or missing access token." >&2
+            exit 1
+          fi
+          echo "::add-mask::$ak_token"
+
+          if ! user=$(jq --exit-status --raw-output \
+            '.username | select(type == "string" and length > 0)' \
+            <<< "$response" 2>/dev/null); then
+            echo "::error::Artifact Keeper returned an invalid or missing username." >&2
+            exit 1
+          fi
+
+          {
+            echo "artifact_keeper_token=$ak_token"
+            echo "artifact_keeper_username=$user"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Install workflow dependencies
         id: install
         shell: bash
@@ -172,9 +212,9 @@ jobs:
         env:
           DEPENDENCY_FILE: ${{ inputs.dependency-file }}
           PYTHON_VERSION: ${{ inputs.python-version }}
-          UV_INDEX: gar=https://europe-west1-python.pkg.dev/nav-data-images-prod/pypi/simple
-          UV_INDEX_GAR_USERNAME: oauth2accesstoken
-          UV_INDEX_GAR_PASSWORD: ${{ steps.auth.outputs.access_token }}
+          UV_INDEX: artifactkeeper=https://artifacts.data.nav.no/pypi/pypi/simple/
+          UV_INDEX_ARTIFACTKEEPER_USERNAME: ${{ steps.artifact-keeper-auth.outputs.artifact_keeper_username }}
+          UV_INDEX_ARTIFACTKEEPER_PASSWORD: ${{ steps.artifact-keeper-auth.outputs.artifact_keeper_token }}
           PYPROJECT_GROUPS: ${{ inputs.pyproject-groups }}
         run: |
           set -euo pipefail
