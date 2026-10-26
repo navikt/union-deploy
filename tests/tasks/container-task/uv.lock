@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.14"
 
 [[package]]
@@ -172,7 +172,7 @@ dependencies = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "flyte", specifier = "==2.7.2" }]
+requires-dist = [{ name = "flyte", specifier = "==2.12.0" }]
 
 [[package]]
 name = "cryptography"
@@ -235,7 +235,7 @@ wheels = [
 
 [[package]]
 name = "flyte"
-version = "2.7.2"
+version = "2.12.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -263,12 +263,12 @@ dependencies = [
     { name = "toml" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/17/bf/87ad4d29400b5be6ea0cdd687ec9db6eb6ccaf518da7ba6ef8f8b8bfb644/flyte-2.7.2-py3-none-any.whl", hash = "sha256:bf3d1ce725daca0483ba3863f1074522bc757c081fe68d365a9bfd5f981bcf3c", size = 1073122, upload-time = "2026-09-08T21:23:40.443Z" },
+    { url = "https://files.pythonhosted.org/packages/59/1e/06e807c0c26ed3971159523c7b07a761011d28c862a4ded948a6ab1663b7/flyte-2.12.0-py3-none-any.whl", hash = "sha256:edf632f0dde469dd7cb9abc2cfb9a37d4dc76d66067155952b257ccb99bc6e6c", size = 1189294, upload-time = "2026-10-19T03:16:06.763Z" },
 ]
 
 [[package]]
 name = "flyteidl2"
-version = "2.0.45"
+version = "2.0.51"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "googleapis-common-protos" },
@@ -277,7 +277,7 @@ dependencies = [
     { name = "protovalidate" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8d/2c/c9255865f121d485988167002ebe9b5c2d22440abee02db620d369bf636f/flyteidl2-2.0.45-py3-none-any.whl", hash = "sha256:6d30c90926aa7d9a50a9dbb16fc639185c1df95fa56865e7d955b4cb4b91adec", size = 378430, upload-time = "2026-09-01T04:28:48.287Z" },
+    { url = "https://files.pythonhosted.org/packages/d0/5f/2963aac9be16b72b781a2091b8d23f0811640f35782dbce482247b5bf7d7/flyteidl2-2.0.51-py3-none-any.whl", hash = "sha256:aadc618101408d7b488baac9d6ec9debfc50788e578c8520d6eaa59b8958c888", size = 385315, upload-time = "2026-10-08T00:21:31.78Z" },
 ]
 
 [[package]]
