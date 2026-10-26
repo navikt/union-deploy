@@ -9,12 +9,6 @@ on:
       - tests/tasks/pyproject-groups/**
       - '!tests/tasks/pyproject-groups/**/*.md'
       - .github/workflows/deploy-test-pyproject-groups.yaml
-  pull_request:
-    paths:
-      - .github/workflows/deploy.yaml
-      - tests/tasks/pyproject-groups/**
-      - '!tests/tasks/pyproject-groups/**/*.md'
-      - .github/workflows/deploy-test-pyproject-groups.yaml
   workflow_dispatch:
 
 jobs:
