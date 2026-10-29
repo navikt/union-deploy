@@ -8,7 +8,7 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "flyte>=2.10.6",
+    "flyte>=2.12.1",
 ]
 
 [project.scripts]
@@ -20,7 +20,7 @@ build-backend = "uv_build"
 
 [dependency-groups]
 numpy-task = [
-    "numpy>=2.2.6",
+    "numpy>=2.5.4",
 ]
 pytest-task = [
     "pytest>=9.1.1",
