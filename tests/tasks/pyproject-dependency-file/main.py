@@ -12,17 +12,9 @@ env = flyte.TaskEnvironment(
         name="flyte",
         extendable=True,
     )
-    .with_env_vars(
-        {
-            "UV_KEYRING_PROVIDER": "subprocess",
-        }
-    )
     .with_uv_project(
         pyproject_file="tests/tasks/pyproject-dependency-file/pyproject.toml",
-        index_url=(
-            "https://oauth2accesstoken@"
-            "europe-west1-python.pkg.dev/nav-data-images-prod/pypi/simple/"
-        ),
+        secret_mounts=flyte.Secret(key="ak-pypi-index", as_env_var="UV_DEFAULT_INDEX"),
     ),
 )
 
