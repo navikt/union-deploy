@@ -23,5 +23,5 @@ numpy-task = [
     "numpy>=2.5.4",
 ]
 pytest-task = [
-    "pytest>=9.1.1",
+    "pytest>=9.2.0",
 ]
