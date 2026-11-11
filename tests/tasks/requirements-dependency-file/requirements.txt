@@ -1,2 +1,2 @@
-flyte==2.12.1
+flyte==2.12.4
 kubernetes==37.0.1
