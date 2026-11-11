@@ -68,19 +68,6 @@ wheels = [
 ]
 
 [[package]]
-name = "asyncssh"
-version = "2.24.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "cryptography" },
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/dd/7f/2d79247bacc562104f312d27efe541673aa177feac89de291bd61bca52be/asyncssh-2.24.0.tar.gz", hash = "sha256:4064c590e59ce2e8d82a2f66d35f3120d765828b4df5e3dbfb07b4a8c24686c9", size = 550148, upload-time = "2026-06-27T20:34:44.755Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/3e/29/908ce0ca5e8cae76662e354a0f08df552d6d221844748b9e5ca06051cc44/asyncssh-2.24.0-py3-none-any.whl", hash = "sha256:9abd46300adcb6d4b73269b34c53cd0d17a138b9a22b5b38008ce7d5808734b7", size = 381237, upload-time = "2026-06-27T20:34:43.198Z" },
-]
-
-[[package]]
 name = "backports-tarfile"
 version = "1.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -341,13 +328,12 @@ wheels = [
 
 [[package]]
 name = "flyte"
-version = "2.12.1"
+version = "2.12.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
     { name = "aiolimiter" },
     { name = "async-lru" },
-    { name = "asyncssh" },
     { name = "click" },
     { name = "cloudpickle" },
     { name = "connectrpc" },
@@ -369,12 +355,12 @@ dependencies = [
     { name = "toml" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9a/28/45f5e7cce4f820c98c0f972253e9548d31403c9907959b99cffdae6b1cda/flyte-2.12.1-py3-none-any.whl", hash = "sha256:de8577c07359acf80e5d2965c0e49f3a9c842bfe23f1937beed0aabfd93c5771", size = 1189572, upload-time = "2026-10-21T18:00:19.129Z" },
+    { url = "https://files.pythonhosted.org/packages/0a/50/ccd246d7446e4d535c27bb20883a92f6a755bd01dd70d50c9274c9cc74e4/flyte-2.12.4-py3-none-any.whl", hash = "sha256:13ad26643ba2966d2876494408899d986cf917f1d4765ede548ca6795c925f02", size = 1237823, upload-time = "2026-11-02T23:01:11.419Z" },
 ]
 
 [[package]]
 name = "flyteidl2"
-version = "2.0.51"
+version = "2.0.53"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "googleapis-common-protos" },
@@ -383,7 +369,7 @@ dependencies = [
     { name = "protovalidate" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d0/5f/2963aac9be16b72b781a2091b8d23f0811640f35782dbce482247b5bf7d7/flyteidl2-2.0.51-py3-none-any.whl", hash = "sha256:aadc618101408d7b488baac9d6ec9debfc50788e578c8520d6eaa59b8958c888", size = 385315, upload-time = "2026-10-08T00:21:31.78Z" },
+    { url = "https://files.pythonhosted.org/packages/30/c5/f71f7f6c06144437c4c089f0b505df4215d824d4296b5a358ec8e05d16a3/flyteidl2-2.0.53-py3-none-any.whl", hash = "sha256:61a1fc68dd2e590104b402082dd509aa1dc64870271ff978c0cc12fd799a8c34", size = 387747, upload-time = "2026-10-27T04:35:17.151Z" },
 ]
 
 [[package]]
@@ -1349,7 +1335,7 @@ wheels = [
 
 [[package]]
 name = "pytest"
-version = "9.1.1"
+version = "9.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
@@ -1360,9 +1346,9 @@ dependencies = [
     { name = "pygments" },
     { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e4/47/b9efed96c114afcfa3c9d3fe98a76a1d14c74a9e266d397cf6eb64be5e01/pytest-9.1.1.tar.gz", hash = "sha256:1088fbde8f2b49d95a549a195707afa7a76a3ce9bcadc26b6d71f0ffda5fe313", size = 1636369, upload-time = "2026-06-19T10:58:32.857Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/79/42/bb4641652e58dedeac2ec51abc1f8cae4fee4ec63899a0999016229a0f2a/pytest-9.2.0.tar.gz", hash = "sha256:97c4f3b1f3c7414aa36465e09b8220f1d03627993bd51b1282e193753c80557b", size = 1797555, upload-time = "2026-10-27T21:30:20.728Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/24/25/1de2678b631f5a49215c6c96fff41ba892b0a34df68d6d80292b1b48aa7f/pytest-9.1.1-py3-none-any.whl", hash = "sha256:37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c", size = 386536, upload-time = "2026-06-19T10:58:31.347Z" },
+    { url = "https://files.pythonhosted.org/packages/51/39/1f5d8c8877a0fa327db959c19341d4be61660de1ab6b7391f9eb805bcd67/pytest-9.2.0-py3-none-any.whl", hash = "sha256:07acdcf88ec174f907dc01af70bf52d49b014bbab03faeeade31c96b18c2e588", size = 411776, upload-time = "2026-10-27T21:30:19.131Z" },
 ]
 
 [[package]]
